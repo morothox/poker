@@ -1,6 +1,3 @@
-from typing import Tuple
-
-
 Suits = ["CLUB", "DIAMOND", "Heart", "SPADE"]
 Ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 flops = []
@@ -68,13 +65,7 @@ class Evaluator:
         is_FLush = False
         if (self.c1 & self.c2 & self.c3 & self.c4 & self.c5 & 0xF000) != 0:
             is_FLush = True
-            if is_FLush:
-                return [self.c1, self.c2, self.c3, self.c4, self.c5]
-            else:
-                return None
-
-
-# q = (self.c1 | self.c2 | self.c3 | self.c4 | self.c5) >> 16
+            q = (self.c1 | self.c2 | self.c3 | self.c4 | self.c5) >> 16
 
 
 def calculate_bit(bit, lenght, target):

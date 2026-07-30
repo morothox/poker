@@ -1,4 +1,12 @@
 from typing import Tuple
+from itertools import combinations
+import importlib.util
+
+_spec = importlib.util.spec_from_file_location("flush_array", "flush-array.py")
+_flush_array = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_flush_array)
+flushes = _flush_array.flushes
+unique5 = _flush_array.unique5
 
 
 Suits = ["CLUB", "DIAMOND", "Heart", "SPADE"]
@@ -57,24 +65,37 @@ class Card:
 
 
 class Evaluator:
-    def __init__(self, c1, c2, c3, c4, c5):
+    def __init__(self, c1, c2, c3, c4, c5, flushes_array, unique5):
         self.c1 = c1
         self.c2 = c2
         self.c3 = c3
         self.c4 = c4
         self.c5 = c5
+        self.flushes = flushes_array
+        self.unique5 = unique5
 
     def evaluate(self):
-        is_FLush = False
         if (self.c1 & self.c2 & self.c3 & self.c4 & self.c5 & 0xF000) != 0:
-            is_FLush = True
-            if is_FLush:
-                return [self.c1, self.c2, self.c3, self.c4, self.c5]
-            else:
-                return None
+            q = (self.c1 | self.c2 | self.c3 | self.c4 | self.c5) >> 16
+            return self.flushes[q]
 
+        # TODO: Hier kommen weitere Hand-Typen (Straight, Trips, etc.)
+        else:
+            q = (self.c1 | self.c2 | self.c3 | self.c4 | self.c5) >> 16
+            return self.unique5[q]
 
-# q = (self.c1 | self.c2 | self.c3 | self.c4 | self.c5) >> 16
+    def evaluate_prime(self):
+        q = self.prime()
+
+    def prime(self):
+        q = (
+            (self.c1 & 0xFF)
+            * (self.c2 & 0xFF)
+            * (self.c3 & 0xFF)
+            * (self.c4 & 0xFF)
+            * (self.c5 & 0xFF)
+        )
+        return q
 
 
 def calculate_bit(bit, lenght, target):
@@ -92,8 +113,27 @@ def calculate_bit(bit, lenght, target):
     return bit
 
 
-hand = Card(rank="A", suit="Heart")
-karten_bit = hand.make_bit()
+deck = []
+for rank in Ranks:
+    for suit in Suits:
+        card = Card(rank, suit)
+        deck.append(card)
 
-print(f"Karte: {hand.rank} von {hand.suit}")
-print(f"Bit-Wert: {karten_bit:032b}")
+
+all_hands = list(combinations(deck, 5))
+prime_set = set()
+for hand in all_hands:
+    input = []
+    i = 0
+    for card in hand:
+        input.append(card.make_bit())
+        i += 1
+        if i == 5:
+            break
+    eval = Evaluator(*input, flushes, unique5)
+    prime = eval.prime()
+    prime_set.add(prime)
+
+prime_array = sorted(prime_set)
+print(f"Anzahl einzigartiger Primzahl-Produkte: {len(prime_array)}")
+print(prime_array[:20])

@@ -62,11 +62,11 @@ class Card:
 
 class Evaluator:
     def __init__(self, c1, c2, c3, c4, c5):
-        self.c1 = c1
-        self.c2 = c2
-        self.c3 = c3
-        self.c4 = c4
-        self.c5 = c5
+        self.c1 = c1.make_bit()
+        self.c2 = c2.make_bit()
+        self.c3 = c3.make_bit()
+        self.c4 = c4.make_bit()
+        self.c5 = c5.make_bit()
 
     def evaluate(self):
         if (self.c1 & self.c2 & self.c3 & self.c4 & self.c5 & 0xF000) != 0:
@@ -77,10 +77,7 @@ class Evaluator:
         if bin(q).count("1") == 5:
             return unique5[q]
 
-        prime = self.prime()
-        for idx, item in enumerate(primes):
-            if item == prime:
-                return idx
+        return primes[str(self.prime())]
 
     def prime(self):
         return (

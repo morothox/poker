@@ -1,5 +1,7 @@
 import json
+from itertools import combinations, combinations_with_replacement
 import os
+from random import sample
 
 Suits = ["CLUB", "DIAMOND", "Heart", "SPADE"]
 Ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
@@ -21,6 +23,12 @@ class Card:
     def __init__(self, rank, suit):
         self.rank = rank
         self.suit = suit
+
+    def __eq__(self, other):
+        if isinstance(other, Card):
+            return self.rank == other.rank and self.suit == other.suit
+        else:
+            return False
 
     def make_bit(self):
         idx = 0
@@ -104,4 +112,68 @@ def calculate_bit(bit, lenght, target):
     return bit
 
 
-# TODO: TEST
+c1 = Card("J", "HEART")
+c2 = Card("J", "DIAMOND")
+c3 = Card("J", "CLUB")
+c4 = Card("K", "SPADE")
+c5 = Card("9", "HEART")
+c6 = Card("A", "DIAMOND")
+c7 = Card("Q", "CLUB")
+seven = [c1, c2, c3, c4, c5, c6, c7]
+
+
+def evaluate_7_cards(seven_cards):
+    best_score = float("inf")
+    for combo in combinations(seven_cards, 5):
+        value = Evaluator(*combo).evaluate()
+        if value <= best_score:
+            best_score = value
+    return best_score
+
+
+test = evaluate_7_cards(seven)
+
+hero = [Card("A", "SPADE"), Card("K", "SPADE")]
+villain = [Card("K", "CLUB"), Card("K", "Heart")]
+
+
+# deck = combinations_with_replacement(Ranks, 2)
+# print(list(deck))
+deck = []
+for rank in Ranks:
+    for suit in Suits:
+        deck.append(Card(rank, suit))
+deck.remove(hero[0])
+deck.remove(villain[0])
+deck.remove(hero[1])
+deck.remove(villain[1])
+
+print(len(deck))
+
+
+N = 100000
+
+
+def monte_carlo(deck, hero, villain):
+    hero_won = 0
+    villain_won = 0
+    tie = 0
+
+    for i in range(N):
+        board = sample(deck, 5)
+        villain_hand = board + villain
+        hero_hand = board + hero
+        villain_score = evaluate_7_cards(villain_hand)
+        hero_score = evaluate_7_cards(hero_hand)
+        if villain_score < hero_score:
+            villain_won += 1
+        elif villain_score > hero_score:
+            hero_won += 1
+        else:
+            tie += 1
+    hero_equity = (hero_won + 0.5 * tie) / N * 100
+    return hero_equity
+
+
+test = monte_carlo(deck, hero, villain)
+print(test)

@@ -1,6 +1,6 @@
 from random import sample
 
-N = 10000
+N = 10000000
 
 
 class Node:
@@ -52,7 +52,7 @@ def cfr(
     cards,
     p0,
     p1,
-    t,
+    iteration,
 ):
     player = len(history) % 2
     opponent = 1 - player
@@ -78,18 +78,28 @@ def cfr(
         if key not in node_map:
             node_map[key] = Node(cards[player], history)
         play = node_map[key]
-        distribution = play.get_strategy(t)
+        weight = 0
+        if player == 0:
+            opponent_reach = p1
+        else:
+            opponent_reach = p0
+        if iteration % 2 == 0 and player == 0:
+            weight = iteration * opponent_reach
+        elif iteration % 2 != 0 and player == 1:
+            weight = iteration * opponent_reach
+
+        distribution = play.get_strategy(weight)
         if player == 0:
             p0_p = p0 * distribution[0]
             p0_b = p0 * distribution[1]
-            pass_func = -cfr(history + "p", cards, p0_p, p1, t)
-            bet_func = -cfr(history + "b", cards, p0_b, p1, t)
+            pass_func = -cfr(history + "p", cards, p0_p, p1, iteration)
+            bet_func = -cfr(history + "b", cards, p0_b, p1, iteration)
 
         else:
             p1_p = p1 * distribution[0]
             p1_b = p1 * distribution[1]
-            pass_func = -cfr(history + "p", cards, p0, p1_p, t)
-            bet_func = -cfr(history + "b", cards, p0, p1_b, t)
+            pass_func = -cfr(history + "p", cards, p0, p1_p, iteration)
+            bet_func = -cfr(history + "b", cards, p0, p1_b, iteration)
         node_value = pass_func * distribution[0] + bet_func * distribution[1]
         if player == 0:
             p = p1

@@ -3,7 +3,7 @@ from itertools import combinations, combinations_with_replacement
 import os
 from random import sample
 
-Suits = ["CLUB", "DIAMOND", "Heart", "SPADE"]
+Suits = ["CLUB", "DIAMOND", "HEART", "SPADE"]
 Ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41]
 
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     test = evaluate_7_cards(seven)
 
     hero = [Card("A", "SPADE"), Card("K", "SPADE")]
-    villain = [Card("K", "CLUB"), Card("K", "Heart")]
+    villain = [Card("K", "CLUB"), Card("K", "HEART")]
 
     # deck = combinations_with_replacement(Ranks, 2)
     # print(list(deck))

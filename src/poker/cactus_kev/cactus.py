@@ -112,16 +112,6 @@ def calculate_bit(bit, lenght, target):
     return bit
 
 
-c1 = Card("J", "HEART")
-c2 = Card("J", "DIAMOND")
-c3 = Card("J", "CLUB")
-c4 = Card("K", "SPADE")
-c5 = Card("9", "HEART")
-c6 = Card("A", "DIAMOND")
-c7 = Card("Q", "CLUB")
-seven = [c1, c2, c3, c4, c5, c6, c7]
-
-
 def evaluate_7_cards(seven_cards):
     best_score = float("inf")
     for combo in combinations(seven_cards, 5):
@@ -129,26 +119,6 @@ def evaluate_7_cards(seven_cards):
         if value <= best_score:
             best_score = value
     return best_score
-
-
-test = evaluate_7_cards(seven)
-
-hero = [Card("A", "SPADE"), Card("K", "SPADE")]
-villain = [Card("K", "CLUB"), Card("K", "Heart")]
-
-
-# deck = combinations_with_replacement(Ranks, 2)
-# print(list(deck))
-deck = []
-for rank in Ranks:
-    for suit in Suits:
-        deck.append(Card(rank, suit))
-deck.remove(hero[0])
-deck.remove(villain[0])
-deck.remove(hero[1])
-deck.remove(villain[1])
-
-print(len(deck))
 
 
 N = 100000
@@ -175,5 +145,33 @@ def monte_carlo(deck, hero, villain):
     return hero_equity
 
 
-test = monte_carlo(deck, hero, villain)
-print(test)
+if __name__ == "__main__":
+    c1 = Card("J", "HEART")
+    c2 = Card("J", "DIAMOND")
+    c3 = Card("J", "CLUB")
+    c4 = Card("K", "SPADE")
+    c5 = Card("9", "HEART")
+    c6 = Card("A", "DIAMOND")
+    c7 = Card("Q", "CLUB")
+    seven = [c1, c2, c3, c4, c5, c6, c7]
+
+    test = evaluate_7_cards(seven)
+
+    hero = [Card("A", "SPADE"), Card("K", "SPADE")]
+    villain = [Card("K", "CLUB"), Card("K", "Heart")]
+
+    # deck = combinations_with_replacement(Ranks, 2)
+    # print(list(deck))
+    deck = []
+    for rank in Ranks:
+        for suit in Suits:
+            deck.append(Card(rank, suit))
+    deck.remove(hero[0])
+    deck.remove(villain[0])
+    deck.remove(hero[1])
+    deck.remove(villain[1])
+
+    print(len(deck))
+
+    test = monte_carlo(deck, hero, villain)
+    print(test)

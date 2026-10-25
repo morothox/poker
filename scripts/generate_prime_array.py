@@ -1,12 +1,15 @@
 from collections import Counter
 import json
 from itertools import combinations, combinations_with_replacement
-from cactus import Card, Evaluator
+from poker.cactus_kev.cactus import Card, Evaluator
+from pathlib import Path
 
-with open("arrays/flushes.json", "r") as f:
+ARRAYS_DIR = Path(__file__).resolve().parents[1] / "src" / "poker" / "cactus_kev" / "arrays"
+
+with open(ARRAYS_DIR / "flushes.json", "r") as f:
     flushes = json.load(f)
 
-with open("arrays/unique5.json", "r") as f:
+with open(ARRAYS_DIR / "unique5.json", "r") as f:
     unique5 = json.load(f)
 
 Suits = ["CLUB", "DIAMOND", "Heart", "SPADE"]
@@ -56,5 +59,5 @@ for primprodukt, sortier_schluessel in sorted_by_value.items():
     final_primes[str(primprodukt)] = rang
     rang += 1
 
-with open("arrays/primes.json", "w") as f:
+with open(ARRAYS_DIR / "primes.json", "w") as f:
     json.dump(final_primes, f)

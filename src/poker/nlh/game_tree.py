@@ -102,6 +102,13 @@ if __name__ == "__main__":
             return 1
         return 1 + sum(count_nodes(child) for child in node.children)
 
-    print("Tree erfolgreich gebaut!")
-    print(f"Wurzel-Aktionen von P0: {root.actions}")
-    print(f"Gesamtanzahl an Nodes im River-Baum: {count_nodes(root)}")
+    def traverse(node):
+        if isinstance(node, TerminalNode):
+            return
+        else:
+            print(node.player, node.actions)
+            children = node.children
+            for child in children:
+                traverse(node=child)
+
+    test = traverse(root)

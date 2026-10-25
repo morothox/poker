@@ -1,6 +1,6 @@
 from random import sample
 
-N = 10000000
+N = 100000
 
 
 class Node:
@@ -38,13 +38,9 @@ class Node:
         return self.my_card == other.my_card and self.history == other.history
 
 
-cards = ["J", "Q"]
 cards_ = {"K": 3, "Q": 2, "J": 1}
 
-print(cards[1])
 node_map = {}
-
-t = 0
 
 
 def cfr(
@@ -78,15 +74,18 @@ def cfr(
         if key not in node_map:
             node_map[key] = Node(cards[player], history)
         play = node_map[key]
-        weight = 0
+
+        # alternating updates: pro Iteration wird nur ein Spieler aktualisiert
+        traverser = iteration % 2
         if player == 0:
-            opponent_reach = p1
+            own_reach, opponent_reach = p0, p1
         else:
-            opponent_reach = p0
-        if iteration % 2 == 0 and player == 0:
-            weight = iteration * opponent_reach
-        elif iteration % 2 != 0 and player == 1:
-            weight = iteration * opponent_reach
+            own_reach, opponent_reach = p1, p0
+
+        # linear averaging: Iteration t zählt t-mal, gewichtet mit der eigenen Reach
+        weight = 0
+        if player == traverser:
+            weight = (iteration + 1) * own_reach
 
         distribution = play.get_strategy(weight)
         if player == 0:
@@ -101,29 +100,24 @@ def cfr(
             pass_func = -cfr(history + "p", cards, p0, p1_p, iteration)
             bet_func = -cfr(history + "b", cards, p0, p1_b, iteration)
         node_value = pass_func * distribution[0] + bet_func * distribution[1]
-        if player == 0:
-            p = p1
-        else:
-            p = p0
-        pass_regret = (pass_func - node_value) * p
-        bet_regret = (bet_func - node_value) * p
-        total_pass = play.regrets[0] + pass_regret
-        total_bet = play.regrets[1] + bet_regret
-        if total_pass <= 0:
-            play.regrets[0] = 0
-        else:
-            play.regrets[0] = total_pass
-        if total_bet <= 0:
-            play.regrets[1] = 0
-        else:
-            play.regrets[1] = total_bet
+
+        if player == traverser:
+            # Regrets mit der Reach des Gegners gewichten, CFR+ floor bei 0
+            pass_regret = (pass_func - node_value) * opponent_reach
+            bet_regret = (bet_func - node_value) * opponent_reach
+            play.regrets[0] = max(0.0, play.regrets[0] + pass_regret)
+            play.regrets[1] = max(0.0, play.regrets[1] + bet_regret)
     return node_value
 
 
-t = 1
-deck = ["K", "Q", "J"]
-for i in range(100000):
-    board = sample(deck, 2)
-    result = cfr("", board, 1.0, 1.0, i)
-for node in node_map:
-    print(node_map[node].get_avg_strategy())
+def train(iterations=N):
+    deck = ["K", "Q", "J"]
+    for i in range(iterations):
+        board = sample(deck, 2)
+        cfr("", board, 1.0, 1.0, i)
+
+
+if __name__ == "__main__":
+    train()
+    for node in sorted(node_map.values(), key=lambda n: (n.history, n.my_card)):
+        print(node.my_card, node.history, node.get_avg_strategy())

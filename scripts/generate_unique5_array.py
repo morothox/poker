@@ -1,4 +1,7 @@
 import json
+from pathlib import Path
+
+ARRAYS_DIR = Path(__file__).resolve().parents[1] / "src" / "poker" / "cactus_kev" / "arrays"
 
 unique5 = [0] * 8192
 
@@ -24,5 +27,5 @@ for i in range(8191, -1, -1):
         unique5[i] = rank
         rank += 1
 
-with open("arrays/unique5.json", "w") as f:
+with open(ARRAYS_DIR / "unique5.json", "w") as f:
     json.dump(unique5, f)

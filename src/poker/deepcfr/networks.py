@@ -1,7 +1,7 @@
 """This is the link to the Paper [[/Users/morothox/Project/poker/DeepCFR+.pdf][DeepCFR]]"""
 
 import tensorflow as tf
-from tensorflow import keras
+import keras
 
 
 class CardEmbedder(keras.layers.Layer):
@@ -62,18 +62,21 @@ class DeepCFRNet(keras.Model):
         self.hole_embedder = CardEmbedder()
         self.board_embedder = CardEmbedder()
         # card branch
-        self.card_dense_layer1 = tf.keras.layers.Dense(192, "relu")
-        self.card_dense_layer2 = tf.keras.layers.Dense(192, "relu")
-        self.card_dense_layer3 = tf.keras.layers.Dense(64, "relu")
+        self.card_dense_layer1 = keras.layers.Dense(192, "relu")
+        self.card_dense_layer2 = keras.layers.Dense(192, "relu")
+        self.card_dense_layer3 = keras.layers.Dense(64, "relu")
         # bet branch
-        self.bet_dense_layer1 = tf.keras.layers.Dense(64, "relu")
-        self.bet_dense_layer2 = tf.keras.layers.Dense(64, "relu")
+
+        self.bet_dense_layer1 = keras.layers.Dense(64, "relu")
+        self.bet_dense_layer2 = keras.layers.Dense(64, "relu")
         # after cards and bets are merged
-        self.combined_layer1 = tf.keras.layers.Dense(64, "relu")
-        self.combined_layer2 = tf.keras.layers.Dense(64, "relu")
-        self.combined_layer3 = tf.keras.layers.Dense(64, "relu")
+        self.combined_layer1 = keras.layers.Dense(64, "relu")
+        self.combined_layer2 = keras.layers.Dense(64, "relu")
+        self.combined_layer3 = keras.layers.Dense(64, "relu")
         # no activation, advantages can be negative and logits get softmaxed outside
-        self.output_layer = tf.keras.layers.Dense(n_actions)
+        self.output_layer = keras.layers.Dense(
+            n_actions, kernel_initializer="zeros", bias_initializer="zeros"
+        )
 
     def call(self, inputs):  # pyright: ignore[reportIncompatibleMethodOverride]
         hole, board, bets = inputs

@@ -4,14 +4,21 @@ version = "0.1.0"
 description = ""
 authors = [{ name = "TheGod0fWar", email = "moritz.sanner@gmx.de" }]
 readme = "README.md"
-requires-python = ">=3.14"
-dependencies = ["tensorflow"]
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "tensorflow>=2.21,<2.22",
+    "keras>=3.15,<3.16",
+]
 
 [dependency-groups]
 dev = ["pytest>=8.0.0"]
 
 [tool.poetry]
 packages = [{ include = "poker", from = "src" }]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,7 +1,7 @@
 from poker.deepcfr.networks import CardEmbedder, DeepCFRNet
+from poker.deepcfr.memory import Memory, transform_to_12
 import tensorflow as tf
 import keras
-
 
 cards = []
 for i in range(52):
@@ -29,34 +29,41 @@ bets = []
 inputs = [hole, board, bets]
 
 
-def deepcfr(T, players, K, inputs):
-    # initialize advantage networks
-    player_0_advantage = DeepCFRNet(3)
-    player_1_advantage = DeepCFRNet(3)
-    # initialize M (storage)
-    M_p0_adv = []
-    M_p1_adv = []
+def deepcfr(T, players, K):
+    # initialize M (player storage)
+    M_p0_adv = Memory()
+    M_p1_adv = Memory()
+    # initialize advantage_model_0
+    advantage_model_0 = DeepCFRNet(3)
+    advantage_model_1 = DeepCFRNet(3)
     # initialize M (strategy)
     strategy_model = DeepCFRNet(3)
-    strategy_model.compile(
-        optimizer="adam",
-        loss="mean_squared_error",  # Macht exakt Summe( (y_true - y_pred)^2 ) / N
-    )
-
-    M_strategy = []
+    # strategy memory
+    M_strategy = Memory()
     for t in range(T):
-        for p in players:
+        for p in range(players):
             for k in range(K):
                 TRAVERSE()
             if p == 0:
-                player_0_advantage.compile(
+                advantage_model_0 = DeepCFRNet(3)
+                advantage_model_0.compile(
                     optimizer="adam",
                     loss="mean_squared_error",  # Macht exakt Summe( (y_true - y_pred)^2 ) / N
                 )
-                player_0_advantage.fit(inputs, M_p0_adv, sample_weight=t)
+                x, y, sample_weight = M_p0_adv.return_x_y()
+                advantage_model_0.fit(x, y, sample_weight=sample_weight)
             else:
-                player_1_advantage.compile(
+                advantage_model_1 = DeepCFRNet(3)
+                advantage_model_1.compile(
                     optimizer="adam",
                     loss="mean_squared_error",  # Macht exakt Summe( (y_true - y_pred)^2 ) / N
                 )
-    strategy_model.fit()
+                x, y, sample_weight = M_p1_adv.return_x_y()
+                advantage_model_1.fit(x, y, sample_weight=sample_weight)
+    strategy_model.compile(
+        optimizer="adam",
+        loss="mean_squared_error",
+    )
+    x, y, sample_weight = M_strategy.return_x_y()
+    strategy_model.fit(x, y, sample_weight=sample_weight)
+    return strategy_model

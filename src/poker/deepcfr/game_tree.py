@@ -110,5 +110,3 @@ if __name__ == "__main__":
             children = node.children
             for child in children:
                 traverse(node=child)
-
-    test = traverse(root)

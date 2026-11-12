@@ -4,8 +4,12 @@ import os
 from random import sample
 
 # Suits: 0=CLUB, 1=DIAMOND, 2=HEART, 3=SPADE
-Suits = [0, 1, 2, 3]
-# Ranks: 0="2" ... 8="10", 9="J", 10="Q", 11="K", 12="A"
+Suits = [
+    0,
+    1,
+    2,
+    3,
+]
 Ranks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 # PRIMES[rank] = Primzahl fuer den Rank-Index (0="2" -> 2, ..., 12="A" -> 41)
 PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41]
